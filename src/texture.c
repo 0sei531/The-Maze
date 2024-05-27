@@ -1,5 +1,9 @@
-#include "../headers/header.h"
+ #include "../headers/header.h"
 
+/* Definition and initialization of wallTextures */
+texture_t wallTextures[NUM_TEXTURES];
+
+/* Static array to store file names of textures */
 static const char *textureFileNames[NUM_TEXTURES] = {
     "./images/redbrick.png",
     "./images/purplestone.png",
@@ -42,4 +46,3 @@ void freeWallTextures(void)
     for (int i = 0; i < NUM_TEXTURES; i++)
         upng_free(wallTextures[i].upngTexture);
 }
-
