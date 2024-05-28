@@ -26,7 +26,7 @@ void changeColorIntensity(color_t *color, float factor)
 void renderFloor(int wallBottomPixel, color_t *texelColor, int x)
 {
     int y, texture_height, texture_width, textureOffsetY, textureOffsetX;
-    float distance, ratio;
+    float ratio;
 
     texture_width = wallTextures[3].width;
     texture_height = wallTextures[3].height;
@@ -34,7 +34,6 @@ void renderFloor(int wallBottomPixel, color_t *texelColor, int x)
     for (y = wallBottomPixel - 1; y < SCREEN_HEIGHT; y++)
     {
         ratio = player.height / (y - SCREEN_HEIGHT / 2);
-        distance = (ratio * PROJ_PLANE) / cos(rays[x].rayAngle - player.rotationAngle);
 
         textureOffsetY = (int)(fabs((float)textureOffsetY * texture_height / 30)) % texture_height;
         textureOffsetX = (int)(fabs((float)textureOffsetX * texture_width / 30)) % texture_width;
@@ -59,10 +58,9 @@ void renderCeil(int wallTopPixel, color_t *texelColor, int x)
 
     for (y = 0; y < wallTopPixel; y++)
     {
-        float distance, ratio;
+        float ratio;
 
         ratio = player.height / (y - SCREEN_HEIGHT / 2);
-        distance = (ratio * PROJ_PLANE) / cos(rays[x].rayAngle - player.rotationAngle);
 
         textureOffsetY = (int)(fabs((float)textureOffsetY * texture_height / 40)) % texture_height;
         textureOffsetX = (int)(fabs((float)textureOffsetX * texture_width / 40)) % texture_width;
