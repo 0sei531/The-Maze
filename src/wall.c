@@ -5,8 +5,7 @@
  * @color: Pointer to the color to be modified
  * @factor: Intensity factor
  */
-void changeColorIntensity(color_t *color, float factor)
-{
+void changeColorIntensity(color_t *color, float factor) {
     color_t a = (*color & 0xFF000000);
     color_t r = (*color & 0x00FF0000) * factor;
     color_t g = (*color & 0x0000FF00) * factor;
@@ -21,16 +20,19 @@ void changeColorIntensity(color_t *color, float factor)
  * @texelColor: Texture color for current pixel
  * @x: Current element in the rays array
  */
-void renderFloor(int wallBottomPixel, color_t *texelColor, int x)
-{
+void renderFloor(int wallBottomPixel, color_t *texelColor, int x) {
     int y, texture_height, texture_width, textureOffsetY, textureOffsetX;
     float distance, ratio;
 
     texture_width = wallTextures[3].width;
     texture_height = wallTextures[3].height;
 
-    for (y = wallBottomPixel - 1; y < SCREEN_HEIGHT; y++)
-    {
+    if (texture_width == 0 || texture_height == 0) {
+        fprintf(stderr, "Error: Texture dimensions are zero.\n");
+        return;
+    }
+
+    for (y = wallBottomPixel - 1; y < SCREEN_HEIGHT; y++) {
         ratio = player.height / (y - SCREEN_HEIGHT / 2);
         distance = (ratio * PROJ_PLANE) / cos(rays[x].rayAngle - player.rotationAngle);
 
@@ -53,16 +55,19 @@ void renderFloor(int wallBottomPixel, color_t *texelColor, int x)
  * @texelColor: Texture color for current pixel
  * @x: Current element in the rays array
  */
-void renderCeil(int wallTopPixel, color_t *texelColor, int x)
-{
+void renderCeil(int wallTopPixel, color_t *texelColor, int x) {
     int y, texture_width, texture_height, textureOffsetY, textureOffsetX;
     float distance, ratio;
 
     texture_width = wallTextures[3].width;
     texture_height = wallTextures[3].height;
 
-    for (y = 0; y < wallTopPixel; y++)
-    {
+    if (texture_width == 0 || texture_height == 0) {
+        fprintf(stderr, "Error: Texture dimensions are zero.\n");
+        return;
+    }
+
+    for (y = 0; y < wallTopPixel; y++) {
         ratio = player.height / (y - SCREEN_HEIGHT / 2);
         distance = (ratio * PROJ_PLANE) / cos(rays[x].rayAngle - player.rotationAngle);
 
@@ -82,16 +87,14 @@ void renderCeil(int wallTopPixel, color_t *texelColor, int x)
 /**
  * renderWall - Render wall projection
  */
-void renderWall(void)
-{
+void renderWall(void) {
     int x, y, texNum, texture_width, texture_height,
         textureOffsetX, wallBottomPixel, wallStripHeight,
         wallTopPixel, distanceFromTop, textureOffsetY;
     float perpDistance, projectedWallHeight;
     color_t texelColor;
 
-    for (x = 0; x < NUM_RAYS; x++)
-    {
+    for (x = 0; x < NUM_RAYS; x++) {
         perpDistance = rays[x].distance * cos(rays[x].rayAngle - player.rotationAngle);
         projectedWallHeight = (TILE_SIZE / perpDistance) * PROJ_PLANE;
         wallStripHeight = (int)projectedWallHeight;
@@ -102,6 +105,12 @@ void renderWall(void)
         texNum = rays[x].wallHitContent - 1;
         texture_width = wallTextures[texNum].width;
         texture_height = wallTextures[texNum].height;
+
+        if (texture_width == 0 || texture_height == 0) {
+            fprintf(stderr, "Error: Texture dimensions are zero for texture number %d.\n", texNum);
+            continue;
+        }
+
         renderFloor(wallBottomPixel, &texelColor, x);
         renderCeil(wallTopPixel, &texelColor, x);
 
@@ -110,8 +119,7 @@ void renderWall(void)
         else
             textureOffsetX = (int)rays[x].wallHitX % TILE_SIZE;
 
-        for (y = wallTopPixel; y < wallBottomPixel; y++)
-        {
+        for (y = wallTopPixel; y < wallBottomPixel; y++) {
             distanceFromTop = y + (wallStripHeight / 2) - (SCREEN_HEIGHT / 2);
             textureOffsetY = distanceFromTop * ((float)texture_height / wallStripHeight);
             texelColor = wallTextures[texNum].texture_buffer[(texture_width * textureOffsetY) + textureOffsetX];
