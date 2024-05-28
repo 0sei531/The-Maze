@@ -30,10 +30,14 @@ void renderFloor(int wallBottomPixel, color_t *texelColor, int x)
     texture_width = wallTextures[3].width;
     texture_height = wallTextures[3].height;
 
+    if (texture_height == 0) {
+        return;
+    }
+
     for (y = wallBottomPixel - 1; y < SCREEN_HEIGHT; y++)
     {
-        textureOffsetY = (int)(fabs((float)textureOffsetY * texture_height / 30)) % texture_height;
-        textureOffsetX = (int)(fabs((float)textureOffsetX * texture_width / 30)) % texture_width;
+        textureOffsetY = (int)(fabs((float)y * texture_height / SCREEN_HEIGHT)) % texture_height;
+        textureOffsetX = (int)(fabs((float)x * texture_width / SCREEN_WIDTH)) % texture_width;
 
         *texelColor = wallTextures[4].texture_buffer[(texture_width * textureOffsetY) + textureOffsetX];
         drawPixel(x, y, *texelColor);
@@ -53,10 +57,16 @@ void renderCeil(int wallTopPixel, color_t *texelColor, int x)
     texture_width = wallTextures[3].width;
     texture_height = wallTextures[3].height;
 
+    if (texture_height == 0) {
+        // Handle the case where texture_height is 0
+        // (e.g., set a default value or throw an error)
+        return;
+    }
+
     for (y = 0; y < wallTopPixel; y++)
     {
-        textureOffsetY = (int)(fabs((float)textureOffsetY * texture_height / 40)) % texture_height;
-        textureOffsetX = (int)(fabs((float)textureOffsetX * texture_width / 40)) % texture_width;
+        textureOffsetY = (int)(fabs((float)y * texture_height / SCREEN_HEIGHT)) % texture_height;
+        textureOffsetX = (int)(fabs((float)x * texture_width / SCREEN_WIDTH)) % texture_width;
 
         *texelColor = wallTextures[6].texture_buffer[(texture_width * textureOffsetY) + textureOffsetX];
         drawPixel(x, y, *texelColor);
